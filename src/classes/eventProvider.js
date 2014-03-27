@@ -225,12 +225,16 @@
         //we'll just give it a tab index of the corresponding gridcache index 
         //that way we'll get the same result every time it is run.
         //configurable within the options.
-        if (grid.config.tabIndex === -1) {
-            grid.$viewport.attr('tabIndex', domUtilityService.numberOfGrids);
-            domUtilityService.numberOfGrids++;
-        } else {
-            grid.$viewport.attr('tabIndex', grid.config.tabIndex);
-        }
+
+        // SP: We do not want our elements randomly throwing tab index on because it interferes with the application.
+
+//        if (grid.config.tabIndex === -1) {
+//            grid.$viewport.attr('tabIndex', domUtilityService.numberOfGrids);
+//            domUtilityService.numberOfGrids++;
+//        } else {
+//            grid.$viewport.attr('tabIndex', grid.config.tabIndex);
+//        }
+
         // resize on window resize
         var windowThrottle;
         var windowResize = function(){
