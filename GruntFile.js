@@ -153,7 +153,10 @@
             ngGrid: {
                 cwd: 'src/templates',
                 src: '*.html',
-                dest: 'build/templates.js'
+                dest: 'build/templates.js',
+				options: {
+					htmlmin: {collapseWhitespace: true}
+				}
             }
         },
         concat: {

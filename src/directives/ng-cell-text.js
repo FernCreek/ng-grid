@@ -1,5 +1,4 @@
-ngGridDirectives.directive('ngCellText',
-  function () {
+ngGridDirectives.directive('ngCellText', function () {
       return function(scope, elm) {
           function mouseover (evt) {
               evt.preventDefault();

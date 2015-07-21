@@ -22,7 +22,7 @@
 
             grid.$groupPanel.on('$destroy', function() {
                 if (grid.$groupPanel){
-                    grid.$groupPanel.off('mousedown');
+                    grid.$groupPanel.off('mousedown dragover drop');
                 }
 
                 grid.$groupPanel = null;
@@ -34,7 +34,7 @@
 
             grid.$topPanel.on('$destroy', function() {
                 if (grid.$topPanel){
-                    grid.$topPanel.off('mousedown');
+                    grid.$topPanel.off('mousedown dragover');
                 }
 
                 if (grid.config.enableColumnReordering && grid.$topPanel) {
@@ -254,11 +254,12 @@
                 domUtilityService.RebuildGrid($scope,grid);
             }, 100);
         };
-        $(grid.$root.parent()).on('resize.nggrid', parentResize);
+        var $parent = $(grid.$root.parent());
+        $parent.on('resize.nggrid', parentResize);
 
         $scope.$on('$destroy', function(){
             $(window).off('resize.nggrid', windowResize);
-            // $(grid.$root.parent()).off('resize.nggrid', parentResize);
+            $parent.off('resize.nggrid', parentResize);
         });
     };
     // In this example we want to assign grid events.

@@ -590,6 +590,23 @@ var ngGrid = function ($scope, options, sortService, domUtilityService, $filter,
                     }
                 }, true));
             }
+
+            $scope.$on('$destroy', function (event) {
+                $scope.selectionProvider = null;
+                $scope.domAccessProvider = null;
+
+                $scope.renderedRows = [];
+                $scope.renderedColumns = [];
+                $scope.columns = [];
+
+                self.rowFactory = null;
+                self.searchProvider = null;
+                self.styleProvider = null;
+
+                self.rowCache = [];
+                self.rowMap = [];
+                self.filteredRows = [];
+            });
         });
 
         // var p = $q.defer();

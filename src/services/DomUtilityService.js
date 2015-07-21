@@ -49,10 +49,12 @@
 
                 grid.$root = null;
                 grid.$topPanel = null;
-                // grid.$groupPanel = null;
+                grid.$groupPanel = null;
                 grid.$headerContainer = null;
-                // grid.$headerScroller = null;
+                $scope.$headerContainer = null;
+                grid.$headerScroller = null;
                 grid.$headers = null;
+                grid.$viewport = null;
                 grid.$canvas = null;
                 grid.$footerPanel = null;
             }

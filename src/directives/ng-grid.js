@@ -4,29 +4,29 @@
         compile: function() {
             return {
                 pre: function($scope, iElement, iAttrs) {
-                    var $element = $(iElement);
                     var options = $scope.$eval(iAttrs.ngGrid);
-                    options.gridDim = new ngDimension({ outerHeight: $($element).height(), outerWidth: $($element).width() });
+                    options.gridDim = new ngDimension({ outerHeight: iElement.height(), outerWidth: iElement.width() });
 
                     var grid = new ngGrid($scope, options, sortService, domUtilityService, $filter, $templateCache, $utils, $timeout, $parse, $http, $q);
 
                     // Set up cleanup now in case something fails
                     $scope.$on('$destroy', function cleanOptions() {
-                        options.gridDim = null;
-                        options.selectRow = null;
-                        options.selectItem = null;
-                        options.selectAll = null;
-                        options.selectVisible = null;
-                        options.groupBy = null;
-                        options.sortBy = null;
-                        options.gridId = null;
-                        options.ngGrid = null;
-                        options.$gridScope = null;
-                        options.$gridServices = null;
+                        options.gridDim = grid.config.gridDim = null;
+                        options.selectRow = grid.config.selectRow = null;
+                        options.selectItem = grid.config.selectItem = null;
+                        options.selectAll = grid.config.selectAll = null;
+                        options.selectVisible = grid.config.selectVisible =  null;
+                        options.groupBy = grid.config.groupBy =  null;
+                        options.sortBy = grid.config.sortBy = null;
+                        options.gridId = grid.config.gridId = null;
+                        options.ngGrid = grid.config.ngGrid = null;
+                        options.$gridScope = grid.config.$gridScope = null;
+                        options.$gridServices = grid.config.$gridServices = null;
 
                         $scope.domAccessProvider.grid = null;
 
                         // Plugins should already have been killed as they are children of $scope
+                        options.plugins = grid.config.plugins = [];
 
                         // Remove the grid's stylesheet from dom
                         angular.element(grid.styleSheet).remove();
@@ -116,6 +116,11 @@
                         domUtilityService.AssignGridContainers($scope, iElement, grid);
                         //now use the manager to assign the event handlers
                         grid.eventProvider = new ngEventProvider(grid, $scope, domUtilityService, $timeout);
+
+                        $scope.$on('$destroy', function () {
+                            grid.footerController = null;
+                            grid.eventProvider = null;
+                        });
 
                         // method for user to select a specific row programatically
                         options.selectRow = function (rowIndex, state) {
