@@ -32,17 +32,18 @@ ngGridDirectives.directive('ngViewport', [function() {
 
         elm.bind('scroll', scroll);
 
-        function mousewheel() {
+        // removed odd focus functionality as it causes problems with my scroll to selection functionality
+        /*function mousewheel() {
             isMouseWheelActive = true;
             if (elm.focus) { elm.focus(); }
             return true;
         }
 
-        elm.bind("mousewheel DOMMouseScroll", mousewheel);
+        elm.bind("mousewheel DOMMouseScroll", mousewheel);*/
 
         elm.on('$destroy', function() {
             elm.off('scroll', scroll);
-            elm.off('mousewheel DOMMouseScroll', mousewheel);
+            //elm.off('mousewheel DOMMouseScroll', mousewheel);
         });
 
         if (!$scope.enableCellSelection) {

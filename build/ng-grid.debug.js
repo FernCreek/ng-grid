@@ -2,7 +2,7 @@
 * ng-grid JavaScript Library
 * Authors: https://github.com/angular-ui/ng-grid/blob/master/README.md 
 * License: MIT (http://www.opensource.org/licenses/mit-license.php)
-* Compiled At: 07/21/2015 13:14
+* Compiled At: 08/12/2015 17:18
 ***********************************************/
 (function(window, $) {
 'use strict';
@@ -141,17 +141,27 @@ var ngMoveSelectionHandler = function($scope, elm, evt, grid) {
     }
 
     if (offset) {
-        var r = items[rowIndex + offset];
+        var selectedRowIndex = rowIndex + offset;
+        var rowTop = selectedRowIndex * $scope.rowHeight;
+        var r = items[selectedRowIndex];
+
         if (r.beforeSelectionChange(r, evt)) {
             r.continueSelection(evt);
             $scope.$emit('ngGridEventDigestGridParent');
 
-            if ($scope.selectionProvider.lastClickedRow.renderedRowIndex >= $scope.renderedRows.length - EXCESS_ROWS - 2) {
-                grid.$viewport.scrollTop(grid.$viewport.scrollTop() + $scope.rowHeight);
+            var viewportScrollTop = grid.$viewport.scrollTop();
+            var viewportHeight = grid.$viewport.height();
+            var scrollTop = viewportScrollTop;
+
+            if (rowTop - $scope.rowHeight < viewportScrollTop) {
+                // selected row is above us
+                scrollTop = Math.max(0, (selectedRowIndex - 1 ) * $scope.rowHeight);
+            } else if (rowTop + ($scope.rowHeight * 2) > viewportScrollTop + viewportHeight) {
+                // row is below us
+                scrollTop += ((rowTop + ($scope.rowHeight * 2)) - (viewportScrollTop + viewportHeight));
             }
-            else if ($scope.selectionProvider.lastClickedRow.renderedRowIndex <= EXCESS_ROWS + 2) {
-                grid.$viewport.scrollTop(grid.$viewport.scrollTop() - $scope.rowHeight);
-            }
+
+            grid.$viewport.scrollTop(scrollTop);
       }
     }
 
@@ -2877,7 +2887,22 @@ var ngSelectionProvider = function (grid, $scope, $parse, $utils) {
     self.multi = grid.config.multiSelect;
     self.selectedItems = grid.config.selectedItems;
     self.selectedIndex = grid.config.selectedIndex;
-    self.lastClickedRow = undefined;
+    self._lastClickedRow = undefined;
+
+    Object.defineProperty(self, 'lastClickedRow', {
+        get: function () {
+            return self._lastClickedRow;
+        },
+        set: function (row) {
+            // ensure the row is the original and not a clone
+            if (row.clone) {
+                self._lastClickedRow = row;
+            } else {
+                self._lastClickedRow = row.orig;
+            }
+        }
+    });
+
     self.ignoreSelectedItemChanges = false; // flag to prevent circular event loops keeping single-select var in sync
     var pKeyExpression = grid.config.primaryKey;
     if (pKeyExpression) {
@@ -3669,17 +3694,18 @@ ngGridDirectives.directive('ngViewport', [function() {
 
         elm.bind('scroll', scroll);
 
-        function mousewheel() {
+        // removed odd focus functionality as it causes problems with my scroll to selection functionality
+        /*function mousewheel() {
             isMouseWheelActive = true;
             if (elm.focus) { elm.focus(); }
             return true;
         }
 
-        elm.bind("mousewheel DOMMouseScroll", mousewheel);
+        elm.bind("mousewheel DOMMouseScroll", mousewheel);*/
 
         elm.on('$destroy', function() {
             elm.off('scroll', scroll);
-            elm.off('mousewheel DOMMouseScroll', mousewheel);
+            //elm.off('mousewheel DOMMouseScroll', mousewheel);
         });
 
         if (!$scope.enableCellSelection) {

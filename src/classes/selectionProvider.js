@@ -3,7 +3,22 @@ var ngSelectionProvider = function (grid, $scope, $parse, $utils) {
     self.multi = grid.config.multiSelect;
     self.selectedItems = grid.config.selectedItems;
     self.selectedIndex = grid.config.selectedIndex;
-    self.lastClickedRow = undefined;
+    self._lastClickedRow = undefined;
+
+    Object.defineProperty(self, 'lastClickedRow', {
+        get: function () {
+            return self._lastClickedRow;
+        },
+        set: function (row) {
+            // ensure the row is the original and not a clone
+            if (row.clone) {
+                self._lastClickedRow = row;
+            } else {
+                self._lastClickedRow = row.orig;
+            }
+        }
+    });
+
     self.ignoreSelectedItemChanges = false; // flag to prevent circular event loops keeping single-select var in sync
     var pKeyExpression = grid.config.primaryKey;
     if (pKeyExpression) {

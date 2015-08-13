@@ -102,17 +102,27 @@ var ngMoveSelectionHandler = function($scope, elm, evt, grid) {
     }
 
     if (offset) {
-        var r = items[rowIndex + offset];
+        var selectedRowIndex = rowIndex + offset;
+        var rowTop = selectedRowIndex * $scope.rowHeight;
+        var r = items[selectedRowIndex];
+
         if (r.beforeSelectionChange(r, evt)) {
             r.continueSelection(evt);
             $scope.$emit('ngGridEventDigestGridParent');
 
-            if ($scope.selectionProvider.lastClickedRow.renderedRowIndex >= $scope.renderedRows.length - EXCESS_ROWS - 2) {
-                grid.$viewport.scrollTop(grid.$viewport.scrollTop() + $scope.rowHeight);
+            var viewportScrollTop = grid.$viewport.scrollTop();
+            var viewportHeight = grid.$viewport.height();
+            var scrollTop = viewportScrollTop;
+
+            if (rowTop - $scope.rowHeight < viewportScrollTop) {
+                // selected row is above us
+                scrollTop = Math.max(0, (selectedRowIndex - 1 ) * $scope.rowHeight);
+            } else if (rowTop + ($scope.rowHeight * 2) > viewportScrollTop + viewportHeight) {
+                // row is below us
+                scrollTop += ((rowTop + ($scope.rowHeight * 2)) - (viewportScrollTop + viewportHeight));
             }
-            else if ($scope.selectionProvider.lastClickedRow.renderedRowIndex <= EXCESS_ROWS + 2) {
-                grid.$viewport.scrollTop(grid.$viewport.scrollTop() - $scope.rowHeight);
-            }
+
+            grid.$viewport.scrollTop(scrollTop);
       }
     }
 
